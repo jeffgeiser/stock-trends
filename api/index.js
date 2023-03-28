@@ -94,8 +94,7 @@ async function findUptrendingStocks(stocksymbols) {
   const uptrendingStocks = [];
   const downtrendingStocks = [];
   const sidewaysStocks = [];
-  const tallyPath = './tally.json';
-  const tally = JSON.parse(fs.readFileSync(tallyPath, 'utf-8'));
+  
 
   for (const symbol of stocksymbols) {
     console.log(`Checking trend for ${symbol}`);
@@ -133,6 +132,7 @@ async function findUptrendingStocks(stocksymbols) {
  
 // Write the updated tally back to the file
 fs.writeFileSync(tallyPath, JSON.stringify(tally, null, 2));
+const tally = db.getState();
 
 return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
   
