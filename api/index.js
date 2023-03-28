@@ -8,12 +8,16 @@ const port = 3000;
 
 
 let db;
+let tally;
 
 (async () => {
   const lowdb = await import('lowdb');
   const adapter = new FileSync.default('./db.json');
   db = lowdb(adapter);
   db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
+  
+  // Read the tally from the file system and store it in a variable
+  tally = db.getState();
 })();
 
 
@@ -89,14 +93,14 @@ async function analyzeTrend(symbol) {
 }
 
 // Identify uptrending stocks
-async function findUptrendingStocks(stocksymbols) {
+
+async function findUptrendingStocks(stocksymbols, tally) {
   console.log('Checking trends for stocks:', stocksymbols);
-  const tally = db.getState();
   const uptrendingStocks = [];
   const downtrendingStocks = [];
   const sidewaysStocks = [];
   
-
+  // Use the tally passed in as a parameter instead of reading from the file system
   for (const symbol of stocksymbols) {
     console.log(`Checking trend for ${symbol}`);
     const trend = await analyzeTrend(symbol);
@@ -126,8 +130,7 @@ async function findUptrendingStocks(stocksymbols) {
       delete tally.uptrend[symbol];
       delete tally.downtrend[symbol];
     }
-  }
-
+  } 
 
 
  
@@ -143,8 +146,8 @@ return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
 
   
   app.get('/', async (req, res) => {
-    const { uptrendingStocks, downtrendingStocks, sidewaysStocks } = await findUptrendingStocks(stocksymbols);
-    res.send(`<html>
+    const { uptrendingStocks, downtrendingStocks, sidewaysStocks } = await findUptrendingStocks(stocksymbols, tally);
+  res.send(`<html>
     <head>
       <title>Is Market in Uptrend?</title>
     </head>
