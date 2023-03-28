@@ -1,0 +1,4 @@
+AAPL
+QQQ
+META
+XLF
