@@ -78,12 +78,12 @@ async function analyzeTrend(symbol) {
 }
 
 // Identify uptrending stocks
-async function findUptrendingStocks(stockSymbols) {
-  console.log('Checking trends for stocks:', stockSymbols);
+async function findUptrendingStocks(stocksymbols) {
+  console.log('Checking trends for stocks:', stocksymbols);
   const uptrendingStocks = [];
   const downtrendingStocks = [];
 
-  for (const symbol of stockSymbols) {
+  for (const symbol of stocksymbols) {
     console.log(`Checking trend for ${symbol}`);
     const trend = await analyzeTrend(symbol);
     console.log(`Trend for ${symbol}: ${trend}`);
