@@ -14,7 +14,7 @@ let tally;
 
 (async () => {
   const lowdb = await import('lowdb');
-  const adapter = new FileSync.default('./db.json');
+  const adapter = new FileSync('./db.json');
   db = lowdb(adapter);
   db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
   
