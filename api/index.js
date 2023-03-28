@@ -6,12 +6,12 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+
 let db;
 
 (async () => {
   const lowdb = await import('lowdb');
-  const FileSync = require('lowdb/adapters/FileSync');
-  const adapter = new FileSync('./db.json');
+  const adapter = new FileSync.default('./db.json');
   db = lowdb(adapter);
   db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
 })();
@@ -91,6 +91,7 @@ async function analyzeTrend(symbol) {
 // Identify uptrending stocks
 async function findUptrendingStocks(stocksymbols) {
   console.log('Checking trends for stocks:', stocksymbols);
+  const tally = db.getState();
   const uptrendingStocks = [];
   const downtrendingStocks = [];
   const sidewaysStocks = [];
@@ -132,39 +133,14 @@ async function findUptrendingStocks(stocksymbols) {
  
 // Write the updated tally back to the file
 fs.writeFileSync(tallyPath, JSON.stringify(tally, null, 2));
-const tally = db.getState();
+
 
 return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
   
 }
 
 
-// async function generateArticle(stockSymbol) {
-//   const prompt = `Write an article about the recent uptrend in ${stockSymbol} stock and discuss the factors contributing to its performance.`;
-//   const response = await openai.Completion.create({
-//     engine: 'text-davinci-002',
-//     prompt,
-//     max_tokens: 500,
-//     n: 1,
-//     stop: null,
-//     temperature: 0.7,
-//   });
 
-//   const generatedArticle = response.choices[0].text.trim();
-//   console.log(`Generated article for ${stockSymbol}:\n${generatedArticle}`);
-//   return generatedArticle;
-// }
-// (async () => {
-//   console.log('Starting to find uptrending stocks...');
-//   const uptrendingStocks = await findUptrendingStocks(stocksymbols);
-//   console.log('Uptrending stocks:', uptrendingStocks);
-// })();
-
-
-  // for (const stockSymbol of uptrendingStocks) {
-  //   const article = await generateArticle(stockSymbol);
-  //   console.log(`\nArticle for ${stockSymbol}:`);
-  //   console.log(article);
   
   app.get('/', async (req, res) => {
     const { uptrendingStocks, downtrendingStocks, sidewaysStocks } = await findUptrendingStocks(stocksymbols);
@@ -191,22 +167,6 @@ return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
     </html>`);
   });
 
-  // app.get('/uptrending-stocks', async (req, res) => {
-  //   // const uptrendingStocks = await findUptrendingStocks(stocksymbols);
-  //   res.send(`
-  //     <html>
-  //       <head>
-  //         <title>Uptrending Stocks</title>
-  //       </head>
-  //       <body>
-  //         <h1>Uptrending Stocks:</h1>
-  //         <ul>
-  //           ${uptrendingStocks.map(stock => `<li>${stock}</li>`).join('')}
-  //         </ul>
-  //       </body>
-  //     </html>
-  //   `);
-  // });
   
 
   module.exports = app;
