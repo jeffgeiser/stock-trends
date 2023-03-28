@@ -82,6 +82,7 @@ async function findUptrendingStocks(stocksymbols) {
   console.log('Checking trends for stocks:', stocksymbols);
   const uptrendingStocks = [];
   const downtrendingStocks = [];
+  const sidewaysStocks = [];
 
   for (const symbol of stocksymbols) {
     console.log(`Checking trend for ${symbol}`);
@@ -101,11 +102,15 @@ async function findUptrendingStocks(stocksymbols) {
       console.log(`Found downtrend for ${symbol}`);
       downtrendingStocks.push(symbol);
     }
+    if (trend !== 'Uptrend' && trend !== 'Downtrend') {
+      console.log(`No clear trend for ${symbol}`);
+      sidewaysStocks.push(symbol);
+    }
   }
 
   console.log('Finished checking trends for stocks');
   console.log('Downtrending stocks:', downtrendingStocks);
-  return uptrendingStocks;
+  return { uptrendingStocks, downtrendingStocks, sidewaysStocks };
   
 }
 
@@ -138,17 +143,26 @@ async function findUptrendingStocks(stocksymbols) {
   //   console.log(article);
   
   app.get('/', async (req, res) => {
-    const uptrendingStocks = await findUptrendingStocks(stocksymbols);
+    const { uptrendingStocks, downtrendingStocks, sidewaysStocks } = await findUptrendingStocks(stocksymbols);
     res.send(`<html>
-      <head>
-        <title>Uptrending Indexes and Stocks</title>
-      </head>
-      <body>
-        <h1>Welcome to Uptrend or Downtrend</h1>
-        <ul>
-            ${uptrendingStocks.map(stock => `<li>${stock}</li>`).join('')}
-          </ul>
-      </body>
+    <head>
+      <title>Uptrending, Downtrending, and Sideways Stocks</title>
+    </head>
+    <body>
+      <h1>Welcome to Uptrend, Downtrend, or Sideways</h1>
+      <h2>Uptrending Stocks</h2>
+      <ul>
+        ${uptrendingStocks.map(stock => `<li>${stock}</li>`).join('')}
+      </ul>
+      <h2>Downtrending Stocks</h2>
+      <ul>
+        ${downtrendingStocks.map(stock => `<li>${stock}</li>`).join('')}
+      </ul>
+      <h2>Sideways Stocks</h2>
+      <ul>
+        ${sidewaysStocks.map(stock => `<li>${stock}</li>`).join('')}
+      </ul>
+    </body>
     </html>`);
   });
 
