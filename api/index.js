@@ -10,7 +10,7 @@ let db;
 
 (async () => {
   const lowdb = await import('lowdb');
-  const FileSync = (await import('lowdb/adapters/FileSync')).default;
+  const FileSync = require('lowdb/adapters/FileSync');
   const adapter = new FileSync('./db.json');
   db = lowdb(adapter);
   db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
