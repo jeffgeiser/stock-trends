@@ -149,11 +149,11 @@ return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
   
   app.get('/', async (req, res) => {
     const { uptrendingStocks, downtrendingStocks, sidewaysStocks } = await findUptrendingStocks(stocksymbols, tally);
-  res.send(`<html>
+    res.send(`<html>
     <head>
       <title>Is Market in Uptrend?</title>
     </head>
-     <body>
+    <body>
       <!-- ... -->
       <h2>Uptrending Stocks</h2>
       <ul>
@@ -169,8 +169,7 @@ return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
       </ul>
       <!-- ... -->
     </body>
-    </html>`);
-  });
+  </html>`, null, 2)});
 
   
 
