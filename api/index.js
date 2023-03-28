@@ -5,6 +5,8 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 const port = 3000;
+const FileSync = require('lowdb/adapters/FileSync');
+
 
 
 let db;
