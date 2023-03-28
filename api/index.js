@@ -13,7 +13,7 @@ let db;
 let tally;
 
 (async () => {
-  const lowdb = await import('lowdb');
+  const lowdb = require('lowdb');
   const adapter = new FileSync('./db.json');
   db = lowdb(adapter);
   db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
