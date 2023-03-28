@@ -127,7 +127,7 @@ async function findUptrendingStocks(stocksymbols) {
 // }
 // (async () => {
 //   console.log('Starting to find uptrending stocks...');
-//   const uptrendingStocks = await findUptrendingStocks(stockSymbols);
+//   const uptrendingStocks = await findUptrendingStocks(stocksymbols);
 //   console.log('Uptrending stocks:', uptrendingStocks);
 // })();
 
@@ -138,7 +138,7 @@ async function findUptrendingStocks(stocksymbols) {
   //   console.log(article);
   
   app.get('/', async (req, res) => {
-    const uptrendingStocks = await findUptrendingStocks(stockSymbols);
+    const uptrendingStocks = await findUptrendingStocks(stocksymbols);
     res.send(`<html>
       <head>
         <title>Uptrending Indexes and Stocks</title>
@@ -153,7 +153,7 @@ async function findUptrendingStocks(stocksymbols) {
   });
 
   // app.get('/uptrending-stocks', async (req, res) => {
-  //   // const uptrendingStocks = await findUptrendingStocks(stockSymbols);
+  //   // const uptrendingStocks = await findUptrendingStocks(stocksymbols);
   //   res.send(`
   //     <html>
   //       <head>
