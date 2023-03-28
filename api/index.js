@@ -1,9 +1,12 @@
+const path = require('path');
 const fetch = require('node-fetch');
 const { DateTime } = require('luxon');
 const fs = require('fs');
 const express = require('express');
 const app = express();
 const port = 3000;
+
+
 
 // Your code snippet goes here
 
@@ -16,7 +19,8 @@ const openaiApiKey = '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';
 // const stockSymbols = ['QQQ', 'AAPL'];
 
 // Read stock symbols from file
-const stockSymbols = fs.readFileSync('stocksymbols.txt', 'utf-8')
+const stocksymbolsPath = path.join(__dirname, 'stocksymbols.txt');
+const stocksymbols = fs.readFileSync(stocksymbolsPath, 'utf-8')
   .trim()
   .split('\n');
 
