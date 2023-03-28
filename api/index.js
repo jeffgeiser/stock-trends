@@ -16,7 +16,7 @@ const openaiApiKey = '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';
 // const stockSymbols = ['QQQ', 'AAPL'];
 
 // Read stock symbols from file
-const stockSymbols = fs.readFileSync('./api/stockSymbols.txt', 'utf-8')
+const stockSymbols = fs.readFileSync('./api/stocksymbols.txt', 'utf-8')
   .trim()
   .split('\n');
 
