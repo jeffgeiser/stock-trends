@@ -5,6 +5,14 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 const port = 3000;
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+
+const adapter = new FileSync('tally.json');
+const db = low(adapter);
+
+// Set the default structure if the database is empty
+db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
 
 
 
@@ -102,15 +110,13 @@ async function findUptrendingStocks(stocksymbols) {
       tally.uptrend[symbol] = (tally.uptrend[symbol] || 0) + 1;
       delete tally.downtrend[symbol];
       delete tally.sideways[symbol];
-    }
-    if (trend === 'Downtrend') {
+    } else if (trend === 'Downtrend') {
       console.log(`Found downtrend for ${symbol}`);
       downtrendingStocks.push(symbol);
       tally.downtrend[symbol] = (tally.downtrend[symbol] || 0) + 1;
       delete tally.uptrend[symbol];
       delete tally.sideways[symbol];
-    }
-    if (trend !== 'Uptrend' && trend !== 'Downtrend') {
+    } else {
       console.log(`No clear trend for ${symbol}`);
       sidewaysStocks.push(symbol);
       tally.sideways[symbol] = (tally.sideways[symbol] || 0) + 1;
@@ -119,12 +125,13 @@ async function findUptrendingStocks(stocksymbols) {
     }
   }
 
-  // console.log('Finished checking trends for stocks');
-  // console.log('Downtrending stocks:', downtrendingStocks);
 
-  fs.writeFileSync(tallyPath, JSON.stringify(tally, null, 2));
 
-  return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
+ 
+// Write the updated tally back to the file
+fs.writeFileSync(tallyPath, JSON.stringify(tally, null, 2));
+
+return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
   
 }
 
