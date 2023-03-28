@@ -5,14 +5,17 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 const port = 3000;
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
 
-const adapter = new FileSync('tally.json');
-const db = low(adapter);
+let db;
 
-// Set the default structure if the database is empty
-db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
+(async () => {
+  const lowdb = await import('lowdb');
+  const FileSync = (await import('lowdb/adapters/FileSync')).default;
+  const adapter = new FileSync('./db.json');
+  db = lowdb(adapter);
+  db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
+})();
+
 
 
 
