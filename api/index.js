@@ -83,6 +83,8 @@ async function findUptrendingStocks(stocksymbols) {
   const uptrendingStocks = [];
   const downtrendingStocks = [];
   const sidewaysStocks = [];
+  const tallyPath = './tally.json';
+  const tally = JSON.parse(fs.readFileSync(tallyPath, 'utf-8'));
 
   for (const symbol of stocksymbols) {
     console.log(`Checking trend for ${symbol}`);
@@ -97,20 +99,32 @@ async function findUptrendingStocks(stocksymbols) {
     if (trend === 'Uptrend') {
       console.log(`Found uptrend for ${symbol}`);
       uptrendingStocks.push(symbol);
+      tally.uptrend[symbol] = (tally.uptrend[symbol] || 0) + 1;
+      delete tally.downtrend[symbol];
+      delete tally.sideways[symbol];
     }
     if (trend === 'Downtrend') {
       console.log(`Found downtrend for ${symbol}`);
       downtrendingStocks.push(symbol);
+      tally.downtrend[symbol] = (tally.downtrend[symbol] || 0) + 1;
+      delete tally.uptrend[symbol];
+      delete tally.sideways[symbol];
     }
     if (trend !== 'Uptrend' && trend !== 'Downtrend') {
       console.log(`No clear trend for ${symbol}`);
       sidewaysStocks.push(symbol);
+      tally.sideways[symbol] = (tally.sideways[symbol] || 0) + 1;
+      delete tally.uptrend[symbol];
+      delete tally.downtrend[symbol];
     }
   }
 
-  console.log('Finished checking trends for stocks');
-  console.log('Downtrending stocks:', downtrendingStocks);
-  return { uptrendingStocks, downtrendingStocks, sidewaysStocks };
+  // console.log('Finished checking trends for stocks');
+  // console.log('Downtrending stocks:', downtrendingStocks);
+
+  fs.writeFileSync(tallyPath, JSON.stringify(tally, null, 2));
+
+  return { uptrendingStocks, downtrendingStocks, sidewaysStocks, tally };
   
 }
 
@@ -146,22 +160,23 @@ async function findUptrendingStocks(stocksymbols) {
     const { uptrendingStocks, downtrendingStocks, sidewaysStocks } = await findUptrendingStocks(stocksymbols);
     res.send(`<html>
     <head>
-      <title>Uptrending, Downtrending, and Sideways Stocks</title>
+      <title>Is Market in Uptrend?</title>
     </head>
-    <body>
-      <h1>Welcome to Uptrend, Downtrend, or Sideways</h1>
+     <body>
+      <!-- ... -->
       <h2>Uptrending Stocks</h2>
       <ul>
-        ${uptrendingStocks.map(stock => `<li>${stock}</li>`).join('')}
+        ${uptrendingStocks.map(stock => `<li>${stock} (in uptrend for ${tally.uptrend[stock]} days)</li>`).join('')}
       </ul>
       <h2>Downtrending Stocks</h2>
       <ul>
-        ${downtrendingStocks.map(stock => `<li>${stock}</li>`).join('')}
+        ${downtrendingStocks.map(stock => `<li>${stock} (in downtrend for ${tally.downtrend[stock]} days)</li>`).join('')}
       </ul>
       <h2>Sideways Stocks</h2>
       <ul>
-        ${sidewaysStocks.map(stock => `<li>${stock}</li>`).join('')}
+        ${sidewaysStocks.map(stock => `<li>${stock} (sideways for ${tally.sideways[stock]} days)</li>`).join('')}
       </ul>
+      <!-- ... -->
     </body>
     </html>`);
   });
