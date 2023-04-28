@@ -6,6 +6,10 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const { Firestore } = require('@google-cloud/firestore');
+require('dotenv').config()
+
+const polygonApiKey=process.env.API_KEY_POLYGON
+const openaiApiKey=process.env.API_KEY_OPENAI
 
 const firestore = new Firestore({
   projectId: trending-stocks, // Replace with your Google Cloud project ID
@@ -29,15 +33,6 @@ let tally;
     stocksymbols.push(doc.id);
   });
 })();
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-API_KEY_POLYGON = os.getenv('polygonApiKey')
-API_KEY_OPENAI = os.getenv('openaiApiKey')
-
-
 
 
 // Static list of stocks
