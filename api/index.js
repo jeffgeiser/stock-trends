@@ -5,32 +5,40 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 const port = 3000;
-const FileSync = require('lowdb/adapters/FileSync');
+const { Firestore } = require('@google-cloud/firestore');
 
+const firestore = new Firestore({
+  projectId: trending-stocks, // Replace with your Google Cloud project ID
+});
 
+const tallyCollection = firestore.collection('tally');
 
-let db;
 let tally;
 
 (async () => {
-  const lowdb = require('lowdb');
-  const adapter = new FileSync('./db.json');
-  db = lowdb(adapter);
-  db.defaults({ uptrend: {}, downtrend: {}, sideways: {} }).write();
-  
-  // Read the tally from the file system and store it in a variable
-  tally = db.getState();
+  const tallyDocRef = await tallyCollection.doc('marketTrends').get();
+  if (tallyDocRef.exists) {
+    tally = tallyDocRef.data();
+  } else {
+    tally = { uptrend: {}, downtrend: {}, sideways: {} };
+    await tallyCollection.doc('marketTrends').set(tally);
+  }
+  stocksymbols = [];
+  const stockSymbolsQuerySnapshot = await stockSymbolsCollection.get();
+  stockSymbolsQuerySnapshot.forEach((doc) => {
+    stocksymbols.push(doc.id);
+  });
 })();
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+API_KEY_POLYGON = os.getenv('polygonApiKey')
+API_KEY_OPENAI = os.getenv('openaiApiKey')
 
 
 
-// Your code snippet goes here
-
-// ... rest of the code
-
-const polygonApiKey = 'hnMJp4oIlKDa_FNiTEvMJp8DlTfyDHt5';
-const openaiApiKey = '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';
 
 // Static list of stocks
 // const stockSymbols = ['QQQ', 'AAPL'];
@@ -45,7 +53,7 @@ const stocksymbols = fs.readFileSync(stocksymbolsPath, 'utf-8')
 async function getStockData(indexSymbol, days = 45) {
   const endDate = DateTime.now();
   const startDate = endDate.minus({ days });
-  const url = `https://api.polygon.io/v2/aggs/ticker/${indexSymbol}/range/1/day/${startDate.toISODate()}/${endDate.toISODate()}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
+  const url = `https://api.polygon.io/v2/aggs/ticker/${indexSymbol}/range/1/day/${startDate.toISODate()}/${endDate.toISODate()}?adjusted=true&sort=asc&limit=120&apiKey=${API_KEY_POLYGON}`;
 
   const response = await fetch(url);
   const json = await response.json();
